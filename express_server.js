@@ -72,6 +72,7 @@ app.get("/urls.json", (req, res) => {
    res.render("urls_show", templateVars);
  });
 
+
  app.get('/u/:shortURL', (req, res) => {
   const longURL = urlDatabase[req.params.shortURL]
   res.redirect(longURL)
@@ -82,14 +83,23 @@ app.get("/urls.json", (req, res) => {
    console.log(req.body);  // Log the POST request body to the console
    res.send("Ok");         // Respond with 'Ok' (we will replace this)
  });
- 
 // Delete a generated URL
 app.post("/urls/:id/delete", (req, res) => {
    delete urlDatabase[req.params.id];
    res.redirect("/urls_index");
  });
- 
+app.get("/urls/:shortURL/edit", (req, res) => {  
+  let shortURL = req.params.shortURL;
+  let longURL = urlDatabase[shortURL];
+  res.render("urls_show", {shortURL, longURL} );
+});
 
+app.post("/urls/:shortURL", (req, res) => { 
+  urlDatabase[req.params.shortURL] = req.body.newURL;
+  res.redirect("/urls/" + req.params.shortURL);
+});
+
+ 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
