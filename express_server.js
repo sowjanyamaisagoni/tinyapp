@@ -82,6 +82,13 @@ app.get("/urls.json", (req, res) => {
    console.log(req.body);  // Log the POST request body to the console
    res.send("Ok");         // Respond with 'Ok' (we will replace this)
  });
+ 
+// Delete a generated URL
+app.post("/urls/:id/delete", (req, res) => {
+   delete urlDatabase[req.params.id];
+   res.redirect("/urls_index");
+ });
+ 
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
