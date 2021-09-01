@@ -113,6 +113,7 @@ app.post("/urls/:shortURL", (req, res) => {
   urlDatabase[req.params.shortURL] = req.body.newURL;
   res.redirect("/urls/" + req.params.shortURL);
 });
+
 app.post("/login", (req, res) => {
    res.cookie('username', req.body.username).redirect("/urls/");; 
  });
@@ -123,6 +124,15 @@ app.post("/login", (req, res) => {
      username: req.cookies["username"]
    };
    res.render("urls_index", templateVars);
+ });
+
+ app.get("/register", (req, res) => {
+   let templateVars = {
+     user: req.cookies["user_id"],
+     shortURL: req.params.id,
+     longURL: urlDatabase[req.params.id],
+   };
+   res.render("urls_register", templateVars)
  });
  
  app.post("/logout", (req, res) => {
