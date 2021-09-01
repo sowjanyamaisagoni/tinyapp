@@ -5,6 +5,19 @@ app.use(cookieParser());
 const PORT = 8080; // default port 8080
 app.set("view engine", "ejs");
 
+const users = { 
+   "userRandomID": {
+     id: "userRandomID", 
+     email: "user@example.com", 
+     password: "purple-monkey-dinosaur"
+   },
+  "user2RandomID": {
+     id: "user2RandomID", 
+     email: "user2@example.com", 
+     password: "dishwasher-funk"
+   }
+ }
+
 const generateRandomString = () => {
    let output = [];
    // We want it to always be 6 digits long, arbitrarily chosen.
@@ -128,11 +141,17 @@ app.post("/login", (req, res) => {
 
  app.get("/register", (req, res) => {
    let templateVars = {
-     user: req.cookies["user_id"],
+     username: req.cookies["username"],
      shortURL: req.params.id,
      longURL: urlDatabase[req.params.id],
    };
    res.render("urls_register", templateVars)
+ });
+ app.post("/register", (req, res) => {
+   let email = req.body.email
+   let password = req.body.password
+   let id = "username" + generateRandomString()
+   res.redirect(`/urls`);
  });
  
  app.post("/logout", (req, res) => {
