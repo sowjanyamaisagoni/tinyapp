@@ -127,18 +127,39 @@ app.post("/urls/:shortURL", (req, res) => {
   res.redirect("/urls/" + req.params.shortURL);
 });
 
-app.post("/login", (req, res) => {
+/*app.post("/login", (req, res) => {
    res.cookie('user_id', req.body.username).redirect("/urls/");; 
- });
+ });*/
  
  app.get("/login", (req, res) => {
    let templateVars = {
      urls: [],
      user: req.cookies["user_id"]
    };
-   res.render("urls_index", templateVars);
+   res.render("urls_login", templateVars);
  });
-
+ app.post("/login", (req, res) => {
+   let email = req.body.email;
+   let password = req.body.password;
+   let loginID = signInCheck();
+   if (loginID) {
+     res.cookie("user_id", loginID).redirect('/urls');
+   } else {
+     res.status(403).send('Error 403 somethings wrong :(');
+   }
+   function signInCheck() {
+     for (let user in users) {
+       if (users[user].email === email) {
+         if (users[user].password === password) {
+           return users[user].id;
+         }
+         return false;
+       }
+     }
+     return false;
+   }
+ });
+ 
  app.get("/register", (req, res) => {
    let templateVars = {
      user: req.cookies["user_id"],
