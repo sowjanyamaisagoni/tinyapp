@@ -1,5 +1,7 @@
 const express = require("express");
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcrypt');
+
 const app = express();
 app.use(cookieParser());
 const PORT = 8080; // default port 8080
@@ -167,7 +169,7 @@ app.post("/urls/:shortURL", (req, res) => {
  });
  app.post("/login", (req, res) => {
    let email = req.body.email;
-   let password = req.body.password;
+   let password = bcrypt.hashSync(req.body.password,10);
    let loginID = signInCheck();
    if (loginID) {
      res.cookie("user_id", loginID).redirect('/urls');
@@ -197,7 +199,7 @@ app.post("/urls/:shortURL", (req, res) => {
  });
    app.post("/register", (req, res) => {
       let email = req.body.email
-      let password = req.body.password
+      let password = bcrypt.hashSync(req.body.password,10)
       let identity = "user" + generateRandomString()
       const newUser = {
          "id": identity,
