@@ -1,6 +1,7 @@
 const express = require("express");
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
+const { getUserByEmail } = require('./helpers');
 
 const app = express();
 
@@ -90,9 +91,9 @@ app.get("/urls.json", (req, res) => {
 
   app.get("/urls", (req, res) => {
    //const userId = req.cookies['id']
-   const userId = req.session['id']
-   console.log('function: ', urlsForUser(userId));
-   console.log('userId: ', userId);
+   const userId = req.session.id;
+   console.log('function: ', urlsForUser(req.session.userId));
+   console.log('userId: ', req.session.id);
    console.log('urlDatabase', urlDatabase);
   let templateVars = {
    //urls: urlDatabase,
@@ -139,7 +140,7 @@ app.get("/urls.json", (req, res) => {
 
  app.post("/urls", (req, res) => {
    //const userId = req.cookies['id']
-   const userId = req.session['id']
+   const userId = req.session.id;
    let tempShortUrl = generateRandomString();
    let longURL = req.body.longURL;
    //urlDatabase[tempShortUrl] = longUrl;
