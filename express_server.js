@@ -1,7 +1,7 @@
 const express = require("express");
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
-const { getUserByEmail } = require('./helpers');
+const getUserByEmail = require('./helpers');
 
 const app = express();
 
@@ -91,17 +91,23 @@ app.get("/urls.json", (req, res) => {
 
   app.get("/urls", (req, res) => {
    //const userId = req.cookies['id']
-   const userId = req.session.id;
-   console.log('function: ', urlsForUser(req.session.userId));
-   console.log('userId: ', req.session.id);
-   console.log('urlDatabase', urlDatabase);
+   const userId = req.session.user_id;
+  // console.log(userId);
+  //  console.log('function: ', urlsForUser(req.session.userId));
+  //  console.log('userId: ', req.session['user_id']);
+  //  console.log(req.session['user_id']);
+  //  console.log('urlDatabase', urlDatabase);
+
   let templateVars = {
    //urls: urlDatabase,
    urls: urlsForUser(userId),
-   user: users[userId]
+   
+   user: req.session.user_id
     };
+    console.log(urlsForUser);
     res.render("urls_index", templateVars);
  });
+
 
  
  app.get("/hello", (req, res) => {
@@ -140,12 +146,12 @@ app.get("/urls.json", (req, res) => {
 
  app.post("/urls", (req, res) => {
    //const userId = req.cookies['id']
-   const userId = req.session.id;
+   const userId = req.session['user_id'];
    let tempShortUrl = generateRandomString();
    let longURL = req.body.longURL;
    //urlDatabase[tempShortUrl] = longUrl;
    urlDatabase[tempShortUrl] = { longURL, userId };
-   console.log(urlDatabase)
+   console.log(urlDatabase);
    res.redirect(`/urls/`); 
    console.log(req.body);  // Log the POST request body to the 
   // res.send("Ok");         // Respond with 'Ok' (we will replace this)
@@ -230,6 +236,7 @@ app.post("/urls/:shortURL", (req, res) => {
       } else {
          users[identity] = newUser;
          req.session.user_id = identity;
+         console.log(identity);
          res.redirect(`/urls`);
       }
    
