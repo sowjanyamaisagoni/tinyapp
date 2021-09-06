@@ -60,7 +60,13 @@ const generateRandomString = () => {
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  const userID = req.session.userID;
+  if (!userID) {
+    res.redirect('/login');
+  }
+  
+  res.redirect('/urls');
+  
 });
 
 app.get("/urls.json", (req, res) => {
@@ -121,8 +127,15 @@ app.get("/urls.json", (req, res) => {
       //user: req.cookies["user_id"]
       user: req.session["user_id"]
     };
-    res.render("urls_new", templateVars);
+    //res.render("urls_new", templateVars);
+    if (req.session.user_id) {
+      res.render('urls_new', templateVars);
+    } else {
+      
+      return res.status(404).send('you are not authorized to create new URLs');
+    }
  });
+
 
  app.get("/urls/:shortURL", (req, res) => {
    let templateVars = { 
@@ -152,14 +165,28 @@ app.get("/urls.json", (req, res) => {
    //urlDatabase[tempShortUrl] = longUrl;
    urlDatabase[tempShortUrl] = { longURL, userId };
    console.log(urlDatabase);
-   res.redirect(`/urls/`); 
+   //res.redirect(`/urls/`); 
+   res.redirect(`/urls/${tempShortUrl}`);
    console.log(req.body);  // Log the POST request body to the 
   // res.send("Ok");         // Respond with 'Ok' (we will replace this)
  });
+ app.post("/urls/:id", (req, res) => {
+  const userID = req.session.userID;
+  if (urlDatabase[req.params.shortURL]['userID'] !== userID) {
+  	return res.status(401).send('You are not authorized .');
+  }
+   res.redirect("/urls");
+ });
+ 
+ 
 
  
 // Delete a generated URL
 app.post("/urls/:id/delete", (req, res) => {
+  const userID = req.session.userID;
+  if (urlDatabase[req.params.shortURL]['userID'] !== userID) {
+  	return res.status(401).send('You are not authorized to delete this URL.');
+  }
    delete urlDatabase[req.params.id];
    res.redirect("/urls");
  });
