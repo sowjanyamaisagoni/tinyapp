@@ -110,7 +110,7 @@ app.get("/urls.json", (req, res) => {
    
    user: req.session.user_id
     };
-    console.log(urlsForUser);
+    //console.log(urlsForUser);
     res.render("urls_index", templateVars);
  });
 
@@ -170,24 +170,24 @@ app.get("/urls.json", (req, res) => {
    console.log(req.body);  // Log the POST request body to the 
   // res.send("Ok");         // Respond with 'Ok' (we will replace this)
  });
- app.post("/urls/:id", (req, res) => {
-  const userID = req.session.userID;
-  if (urlDatabase[req.params.shortURL]['userID'] !== userID) {
-  	return res.status(401).send('You are not authorized .');
-  }
-   res.redirect("/urls");
- });
+//  app.post("/urls/:id", (req, res) => {
+//   const userID = req.session.userID;
+//   if (urlDatabase[req.params.shortURL]['userID'] !== userID) {
+//   	return res.status(401).send('You are not authorized .');
+//   }
+//    res.redirect("/urls");
+//  });
  
  
 
  
 // Delete a generated URL
-app.post("/urls/:id/delete", (req, res) => {
+app.post("/urls/:shortURL/delete", (req, res) => {
   const userID = req.session.userID;
   if (urlDatabase[req.params.shortURL]['userID'] !== userID) {
   	return res.status(401).send('You are not authorized to delete this URL.');
   }
-   delete urlDatabase[req.params.id];
+   delete urlDatabase[req.params.shortURL];
    res.redirect("/urls");
  });
  app.get("/urls/:shortURL/edit", (req, res) => {  
@@ -214,29 +214,41 @@ app.post("/urls/:shortURL", (req, res) => {
    };
    res.render("urls_login", templateVars);
  });
+
+  const signInCheck =  function(email, password) {
+
+   //let hash_password = bcrypt.hashSync(password,10);
+  for (let user in users) {
+    if (users[user].email === email) {
+       let a =bcrypt.compareSync(password, users[user].password);
+      if (a) {
+        return users[user].id;
+      }
+     
+      
+      return false;
+      
+    }
+  }
+  //console.log("bug2");
+  return false;
+}
  app.post("/login", (req, res) => {
    let email = req.body.email;
-   let password = bcrypt.hashSync(req.body.password,10);
-   let loginID = signInCheck();
+   let loginID = signInCheck(email, req.body.password);
+   //console.log("@@@@@@@@@@@@@@@@@" + loginID);
    if (loginID) {
-     res.session("user_id", loginID).redirect('/urls');
+     req.session.user_id = loginID;
+     
+     
+     res.redirect('/urls');
      
    } else {
      res.status(403).send('Error 403 somethings wrong :(');
    }
-   function signInCheck() {
-     for (let user in users) {
-       if (users[user].email === email) {
-         if (users[user].password === password) {
-           return users[user].id;
-         }
-         return false;
-       }
-     }
-     return false;
-   }
+   
  });
- 
+
  app.get("/register", (req, res) => {
    let templateVars = {
      user: req.session["user_id"],
@@ -248,6 +260,7 @@ app.post("/urls/:shortURL", (req, res) => {
    app.post("/register", (req, res) => {
       let email = req.body.email
       let password = bcrypt.hashSync(req.body.password,10)
+      console.log("password",req.body.password,"hash",password);
       let identity = "user" + generateRandomString()
       const newUser = {
          "id": identity,
@@ -291,3 +304,6 @@ app.post("/urls/:shortURL", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+
+
+
