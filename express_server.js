@@ -206,10 +206,10 @@ app.get("/register", (req, res) => {
   res.render("urls_register", { user: false });
 });
 app.post("/register", (req, res) => {
-  const userId = req.session.user_id;
-  if (!userId) {
-    res.status(401).redirect("/login");
-  }
+  // const userId = req.session.user_id;
+  // if (!userId) {
+  //   res.status(401).redirect("/login");
+  // }
   const email = req.body.email;
   const password = bcrypt.hashSync(req.body.password, 10);
   const identity = "user" + generateRandomString();
